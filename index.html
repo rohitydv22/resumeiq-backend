@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="ResumeIQ — AI-powered resume scoring. Upload your resume, paste the job description, get an instant compatibility analysis." />
+  <meta name="keywords" content="resume, job match, AI resume analyzer, resume score, career" />
+  <meta name="author" content="ResumeIQ" />
+  <meta name="theme-color" content="#080a0e" />
+  <title>ResumeIQ — AI Resume Matcher</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="static/css/styles.css" />
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="stroke: #00e5ff" aria-hidden="true">
+        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z"/>
+      </svg>
+    </div>
+    <span class="logo-text">Resume<span>IQ</span></span>
+  </div>
+  <span class="header-tag">AI · POWERED · ANALYSIS</span>
+</header>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-label">Intelligent Resume Scoring</div>
+  <h1>
+    KNOW YOUR<br>
+    <span class="line2">MATCH SCORE</span><br>
+    <span class="line3">BEFORE YOU APPLY</span>
+  </h1>
+  <p>Upload your resume, paste the job description — get an instant AI-powered compatibility analysis with skill gap insights.</p>
+</section>
+
+<!-- ── FORM ── -->
+<div class="main-card">
+  <div class="card">
+    <div class="section-label">01 · Upload Resume</div>
+
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" id="resumeFile" accept=".pdf,.docx,.txt" aria-label="Upload resume (PDF, DOCX, or TXT)" />
+      <div class="upload-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 12V4M8 8l4-4 4 4"/>
+        </svg>
+      </div>
+      <div class="upload-title">Drop your resume here</div>
+      <div class="upload-sub">or click to browse · PDF, DOCX, or TXT · Max 10MB</div>
+    </div>
+
+    <div class="file-selected" id="fileSelected">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+      <span id="fileName">file.pdf</span>
+    </div>
+
+    <div class="section-label" style="margin-top: 28px;">02 · Job Description</div>
+
+    <textarea class="jd-textarea" id="jobDesc" placeholder="Paste the full job description here...&#10;&#10;Example:&#10;We are looking for a Senior Backend Engineer proficient in Python, AWS, Docker, and Kubernetes..." aria-label="Job description"></textarea>
+
+    <button type="button" class="submit-btn" id="analyzeBtn" onclick="analyzeResume()">
+      <span class="btn-text">ANALYZE MATCH →</span>
+      <span class="btn-loading" aria-live="polite">⟳ ANALYZING...</span>
+    </button>
+
+    <div class="error-box" id="errorBox" role="alert">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="errorMsg"></span>
+    </div>
+
+    <div id="results" aria-live="polite">
+      <div class="score-hero">
+        <div class="score-ring">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <circle class="track" cx="50" cy="50" r="45"/>
+            <circle class="fill" id="ringFill" cx="50" cy="50" r="45"/>
+          </svg>
+          <div class="score-center">
+            <span class="score-number" id="scoreNum">0</span>
+            <span class="score-pct">%</span>
+          </div>
+        </div>
+        <div class="score-meta">
+          <h2 id="scoreTitle">Analyzing...</h2>
+          <p id="scoreDesc">Processing your resume against the job description.</p>
+          <div class="score-badges">
+            <span id="scoreBadge"></span>
+            <span id="roleSuitability" class="role-suitability-badge"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-label">Score Breakdown</div>
+      <div class="breakdown-grid">
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-name">TF-IDF Cosine</span>
+            <span class="metric-value" id="m-cosine">0%</span>
+          </div>
+          <div class="metric-bar"><div class="metric-bar-fill bar-cosine" id="b-cosine"></div></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-name">Skill Overlap</span>
+            <span class="metric-value" id="m-skill">0%</span>
+          </div>
+          <div class="metric-bar"><div class="metric-bar-fill bar-skill" id="b-skill"></div></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-name">Experience Match</span>
+            <span class="metric-value" id="m-exp">0%</span>
+          </div>
+          <div class="metric-bar"><div class="metric-bar-fill bar-exp" id="b-exp"></div></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-name">Keyword Density</span>
+            <span class="metric-value" id="m-density">0%</span>
+          </div>
+          <div class="metric-bar"><div class="metric-bar-fill bar-density" id="b-density"></div></div>
+        </div>
+      </div>
+
+      <div class="weight-info">
+        <span style="font-size:11px; color: var(--muted); margin-right:4px;">WEIGHTS:</span>
+        <span class="weight-item"><span class="weight-dot" style="background:#00e5ff"></span>Cosine 40%</span>
+        <span class="weight-item"><span class="weight-dot" style="background:#a259ff"></span>Skills 25%</span>
+        <span class="weight-item"><span class="weight-dot" style="background:#ff6b35"></span>Experience 20%</span>
+        <span class="weight-item"><span class="weight-dot" style="background:#00e676"></span>Density 15%</span>
+      </div>
+
+      <div class="section-label" style="margin-top:28px;">Skills Analysis</div>
+      <div class="skills-grid">
+        <div class="skills-panel">
+          <div class="skills-panel-title matched"><span class="dot dot-matched"></span>Matched Skills</div>
+          <div id="matchedSkills"></div>
+        </div>
+        <div class="skills-panel">
+          <div class="skills-panel-title missing"><span class="dot dot-missing"></span>Missing Skills</div>
+          <div id="missingSkills"></div>
+        </div>
+      </div>
+
+      <div class="section-label" style="margin-top:28px;">Keywords to Add</div>
+      <div class="keywords-panel">
+        <p class="keywords-desc">Important keywords from the job description not found in your resume:</p>
+        <div id="missingKeywords"></div>
+      </div>
+
+      <div class="section-label" style="margin-top:28px;">Improvement Suggestions</div>
+      <div class="suggestions-grid">
+        <div class="suggestion-card">
+          <div class="suggestion-header"><span class="suggestion-icon">✦</span><h3>Skills to Add</h3></div>
+          <ul id="skillsToAdd"></ul>
+        </div>
+        <div class="suggestion-card">
+          <div class="suggestion-header"><span class="suggestion-icon">◆</span><h3>Tools & Technologies to Learn</h3></div>
+          <ul id="toolsToLearn"></ul>
+        </div>
+        <div class="suggestion-card">
+          <div class="suggestion-header"><span class="suggestion-icon">▲</span><h3>Resume Improvements</h3></div>
+          <ul id="resumeImprovements"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>Built with <span>FastAPI</span> · spaCy · scikit-learn · TF-IDF · Cosine Similarity</footer>
+
+<script src="static/js/main.js"></script>
+</body>
+</html>
